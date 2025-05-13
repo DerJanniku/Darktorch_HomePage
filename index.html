@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dark Torch - Illuminate Your Workflow</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root {
+            --bg-dark: #101214; 
+            --bg-medium: #1a1d21; 
+            --bg-light-accent: #2c3038;
+            --text-light: #e0e0e0;
+            --text-secondary: #a0a0a0;
+            --accent-torch: #ff9900; 
+            --accent-torch-deep: #e67e00;
+            --accent-cool: #00bfff; 
+            --accent-cool-light: #7dd3fc;
+            --border-color: #303338;
+            --error-color: #ff4d4d;
+            --success-color: #33cc77;
+            --shadow-color: rgba(0,0,0,0.5);
+            --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            --font-heading: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-dark);
+            color: var(--text-light);
+            line-height: 1.7;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Header & Navigation */
+        header {
+            background-color: rgba(26, 29, 33, 0.9); /* Slightly more opaque */
+            backdrop-filter: blur(12px); /* Increased blur */
+            padding: 1rem 0;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3); /* Softer shadow */
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo-link { text-decoration: none; }
+        .logo {
+            font-family: var(--font-heading);
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-light);
+            letter-spacing: -1px;
+        }
+        .logo .torch-text {
+            color: var(--accent-torch);
+            text-shadow: 0 0 8px var(--accent-torch), 0 0 12px var(--accent-torch-deep);
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            align-items: center;
+        }
+        nav ul li { margin-left: 12px; } 
+        nav ul li a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 0.95rem;
+            padding: 0.7rem 1.1rem; 
+            border-radius: 6px;
+            transition: color 0.2s ease, background-color 0.2s ease, transform 0.2s ease;
+            font-weight: 500;
+        }
+        nav ul li a:hover {
+            color: var(--accent-cool-light);
+            background-color: var(--bg-light-accent);
+            transform: translateY(-2px);
+        }
+        nav ul li a.active {
+            color: var(--accent-cool);
+            background-color: var(--bg-light-accent);
+            font-weight: 700; /* Bolder active state */
+        }
+        .nav-button, .nav-button-secondary {
+            background-color: var(--accent-torch);
+            color: var(--bg-dark) !important; 
+            font-weight: bold !important;
+            box-shadow: 0 3px 8px rgba(255,153,0,0.35);
+            padding: 0.7rem 1.2rem !important; /* Ensure padding consistency */
+        }
+        .nav-button:hover {
+            background-color: var(--accent-torch-deep) !important;
+            color: white !important;
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 5px 12px rgba(255,153,0,0.45);
+        }
+        .nav-button-secondary {
+             background-color: var(--accent-cool);
+             box-shadow: 0 3px 8px rgba(0,191,255,0.35);
+        }
+        .nav-button-secondary:hover {
+            background-color: #00a0d1 !important; 
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 5px 12px rgba(0,191,255,0.45);
+        }
+
+        /* Account Dropdown */
+        .account-menu { position: relative; }
+        .account-menu-toggle {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.7rem 1.1rem; /* Match other nav links */
+            border-radius: 6px;
+        }
+        .account-menu-toggle:hover, .account-menu-toggle.active {
+             background-color: var(--bg-light-accent);
+        }
+        .account-menu-toggle svg {
+            width: 20px; height: 20px; /* Slightly smaller icon */
+            fill: var(--text-secondary);
+            transition: fill 0.2s ease;
+        }
+        .account-menu-toggle:hover svg, .account-menu-toggle.active svg {
+            fill: var(--accent-cool-light);
+        }
+        .account-menu-toggle span { font-weight: 500; }
+        .account-menu-toggle.active span { color: var(--accent-cool); font-weight: 700;}
+
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: calc(100% + 12px); /* Slightly more spacing */
+            background-color: var(--bg-medium);
+            min-width: 200px; /* Wider dropdown */
+            box-shadow: 0 10px 25px var(--shadow-color); /* Enhanced shadow */
+            border-radius: 8px; /* More rounded */
+            z-index: 1001;
+            border: 1px solid var(--border-color);
+            overflow: hidden; 
+            animation: fadeInDropdown 0.25s ease-out forwards;
+        }
+        .dropdown-content.show { display: block; }
+        .dropdown-content a {
+            color: var(--text-secondary);
+            padding: 14px 18px; /* More padding */
+            text-decoration: none;
+            display: flex; /* For icon alignment */
+            align-items: center;
+            gap: 10px;
+            font-size: 0.9rem;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+         .dropdown-content a svg {
+            width: 16px; height: 16px;
+            fill: var(--text-secondary);
+            transition: fill 0.2s ease;
+        }
+        .dropdown-content a:hover {
+            background-color: var(--bg-light-accent);
+            color: var(--accent-cool-light);
+        }
+        .dropdown-content a:hover svg {
+            fill: var(--accent-cool-light);
+        }
+        .dropdown-content .dropdown-username {
+            padding: 14px 18px;
+            font-weight: bold;
+            color: var(--text-light);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 0.95rem;
+            background-color: var(--bg-light-accent); /* Slight distinction */
+        }
+
+        /* Main Content Area */
+        #app-content {
+            flex-grow: 1;
+            padding: 60px 0; /* Increased padding */
+            display: flex; 
+            justify-content: center;
+            align-items: flex-start; 
+        }
+
+        /* Generic Page Styles */
+        .page-section {
+            width: 100%;
+            max-width: 900px;
+            background-color: var(--bg-medium);
+            padding: 3rem 3.5rem; /* Increased padding */
+            border-radius: 16px; /* More rounded */
+            box-shadow: 0 10px 35px var(--shadow-color); /* Softer, larger shadow */
+            animation: fadeInScaleUp 0.5s ease-out;
+            margin: 0 1rem; 
+        }
+        .page-section h1, .page-section h2 {
+            font-family: var(--font-heading);
+            color: var(--text-light);
+            margin-bottom: 1.8rem; /* More spacing */
+            text-align: center;
+        }
+        .page-section h1 { font-size: 2.8rem; letter-spacing: -0.5px; }
+        .page-section h2 { font-size: 2.2rem; }
+        .page-section p {
+            color: var(--text-secondary);
+            margin-bottom: 1.8rem;
+            line-height: 1.8;
+        }
+        .page-section ul { list-style-position: inside; margin-bottom: 1.8rem; padding-left: 20px; }
+        .page-section li { margin-bottom: 0.8rem; }
+
+        /* Home Page Specific Styles */
+        .home-hero {
+            text-align: center;
+            padding: 100px 20px; /* More padding */
+            background: linear-gradient(145deg, var(--bg-dark) 10%, var(--bg-medium) 90%); /* Adjusted gradient */
+            border-radius: 16px;
+            width: 100%;
+            animation: fadeInScaleUp 0.6s ease-out;
+        }
+        .home-hero h1 {
+            font-family: var(--font-heading);
+            font-size: 3.8rem; /* Larger hero title */
+            color: var(--text-light);
+            margin-bottom: 1.5rem;
+            line-height: 1.25;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.25);
+        }
+        .home-hero .highlight { color: var(--accent-torch); }
+        .home-hero p.subtitle {
+            font-size: 1.4rem; /* Larger subtitle */
+            color: var(--text-secondary);
+            margin-bottom: 3rem;
+            max-width: 750px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .cta-button {
+            background-color: var(--accent-torch);
+            color: var(--bg-dark);
+            padding: 1.2rem 3rem; /* Larger CTA */
+            font-size: 1.2rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: background-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            display: inline-block;
+            box-shadow: 0 5px 12px rgba(255,153,0,0.35);
+        }
+        .cta-button:hover {
+            background-color: var(--accent-torch-deep);
+            color: white;
+            transform: translateY(-4px) scale(1.05); /* More pronounced hover */
+            box-shadow: 0 8px 18px rgba(255,153,0,0.45);
+        }
+
+        .features-section { padding: 80px 0; text-align: center; }
+        .features-section h2 {
+            font-family: var(--font-heading);
+            font-size: 3rem; /* Larger section title */
+            margin-bottom: 3.5rem;
+            color: var(--text-light);
+        }
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Slightly wider cards */
+            gap: 3rem; /* More gap */
+        }
+        .feature-card {
+            background-color: var(--bg-medium);
+            padding: 2.5rem; /* More padding */
+            border-radius: 12px; /* More rounded */
+            text-align: left;
+            box-shadow: 0 6px 18px var(--shadow-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border-left: 5px solid var(--accent-cool); /* Thicker border */
+        }
+        .feature-card:hover {
+            transform: translateY(-8px); /* More hover effect */
+            box-shadow: 0 10px 30px var(--shadow-color);
+        }
+        .feature-card svg { 
+            width: 48px; height: 48px; /* Larger icons */
+            margin-bottom: 1.2rem;
+            fill: var(--accent-cool);
+        }
+        .feature-card h3 {
+            font-family: var(--font-heading);
+            font-size: 1.6rem; /* Larger card title */
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+        .feature-card p { font-size: 1rem; color: var(--text-secondary); }
+
+        .testimonial-section { padding: 80px 0; }
+        .testimonial-section h2 { font-family: var(--font-heading); font-size: 3rem; margin-bottom: 3.5rem; text-align: center; color: var(--text-light); }
+        .testimonial-card {
+            background-color: var(--bg-medium);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 6px 18px var(--shadow-color);
+            margin-bottom: 2.5rem;
+            border-left: 5px solid var(--accent-torch);
+        }
+        .testimonial-card blockquote {
+            font-style: italic;
+            color: var(--text-light);
+            margin-bottom: 1.2rem;
+            font-size: 1.2rem; /* Larger quote text */
+            line-height: 1.6;
+        }
+        .testimonial-card cite {
+            display: block;
+            text-align: right;
+            color: var(--accent-torch);
+            font-weight: bold;
+            font-size: 1rem;
+        }
+
+        /* Auth Forms */
+        .auth-container {
+            padding: 3rem 3.5rem; /* More padding */
+            border-radius: 16px;
+            max-width: 480px; /* Slightly wider */
+        }
+        .auth-container .form-title { font-size: 2.2rem; margin-bottom: 1.2rem; }
+        .auth-container .form-subtitle { font-size: 1.05rem; margin-bottom: 2.5rem; }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            padding: 1rem; /* Larger input padding */
+            font-size: 1.05rem;
+        }
+        .form-group input[type="text"]:focus,
+        .form-group input[type="email"]:focus,
+        .form-group input[type="password"]:focus {
+            box-shadow: 0 0 0 4px rgba(0, 191, 255, 0.25); /* More prominent focus */
+        }
+        .btn-submit {
+            padding: 1.1rem; /* Larger submit button */
+            font-size: 1.15rem;
+        }
+        .btn-submit .btn-text { display: inline; }
+        .btn-submit .btn-loader { display: none; font-size: 1rem; }
+
+
+        /* Pricing Page */
+        .pricing-grid { gap: 2.5rem; }
+        .pricing-card {
+            padding: 2.5rem;
+            border-radius: 12px;
+        }
+        .pricing-card.featured {
+            transform: scale(1.05); /* Make featured stand out more */
+            box-shadow: 0 0 35px rgba(255,153,0,0.4);
+        }
+        .pricing-card.featured:hover {
+             transform: scale(1.07) translateY(-5px);
+        }
+        .pricing-card h3 { font-size: 2rem; }
+        .pricing-card .price { font-size: 2.8rem; }
+        .pricing-card ul { margin: 2rem 0; }
+        .pricing-card li { margin-bottom: 1rem; font-size: 0.95rem; }
+
+        /* Forum Page */
+        .forum-topic-list li {
+            padding: 1.2rem 1.8rem;
+            border-radius: 8px;
+            margin-bottom: 1.2rem;
+        }
+        .forum-topic-list li a { font-size: 1.1rem; }
+        .forum-topic-list li p { font-size: 0.9rem; }
+
+        /* Footer */
+        footer { padding: 2.5rem 0; }
+        
+        /* Animations */
+        @keyframes fadeInScaleUp {
+            from { opacity: 0; transform: translateY(25px) scale(0.97); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeInDropdown {
+            from { opacity: 0; transform: translateY(-15px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @keyframes fadeInMessage {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 900px) {
+            .home-hero h1 { font-size: 3.2rem; }
+            .home-hero p.subtitle { font-size: 1.2rem; }
+            .features-section h2, .testimonial-section h2 { font-size: 2.5rem; }
+            .page-section h1 { font-size: 2.2rem; }
+            .page-section h2 { font-size: 1.8rem; }
+        }
+
+        @media (max-width: 768px) { 
+            nav { flex-direction: column; align-items: center; } /* Center nav items on mobile */
+            .logo-link { margin-bottom: 1rem; }
+            nav ul { flex-direction: column; align-items: stretch; width: 100%; }
+            nav ul li { margin-left: 0; margin-bottom: 0.6rem; width: 100%; }
+            nav ul li a { display: block; text-align: center; }
+            .account-menu { width: 100%; } /* Make account menu full width */
+            .account-menu-toggle { justify-content: center; } /* Center toggle content */
+            .dropdown-content { left: 0; right: 0; width:auto; min-width: 0; top: calc(100% + 5px); } /* Full width dropdown */
+            
+            .auth-container, .page-section, .home-hero { padding: 2rem 1.5rem; margin:0 0.5rem; }
+            .page-section h1, .auth-container .form-title { font-size: 2rem; }
+        }
+        @media (max-width: 480px) { 
+            .home-hero h1 { font-size: 2.2rem; }
+            .home-hero p.subtitle { font-size: 1rem; }
+            .cta-button { padding: 1rem 2rem; font-size: 1rem; }
+            .features-section h2, .testimonial-section h2 { font-size: 1.8rem; }
+            .features-grid { grid-template-columns: 1fr; gap: 2rem;} /* Stack feature cards */
+            .pricing-grid { grid-template-columns: 1fr; gap: 2rem;} /* Stack pricing cards */
+            .pricing-card.featured { transform: scale(1); } /* Reset featured scale on small mobile */
+            .pricing-card.featured:hover { transform: translateY(-5px); }
+            .page-section h1, .auth-container .form-title { font-size: 1.8rem; }
+            .page-section h2 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <nav id="main-nav">
+                <a href="#home" class="logo-link" data-page="home"><div class="logo">Dark<span class="torch-text">Torch</span></div></a>
+                
+                    
+            
+        </div>
+    </header>
+
+    <main id="app-content">
+        <section class="page-section auth-container" id="login-section">
+            <h1 class="form-title">Login</h1>
+            <p class="form-subtitle">Enter your credentials to access your account.</p>
+            <form id="login-form">
+                <div class="form-group">
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" placeholder="Your Username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" placeholder="Your Password" required>
+                </div>
+                <button type="submit" class="btn-submit">
+                    <span class="btn-text">Login</span>
+                    <span class="btn-loader">Loading...</span>
+                </button>
+            </form>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year"></span> DarkTorch App. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <svg width="0" height="0" style="display:none;">
+        <symbol id="icon-cog" viewBox="0 0 24 24"><path d="M19.43 12.98c.04-.32.07-.64.07-.98s-.03-.66-.07-.98l2.11-1.65c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.3-.61-.22l-2.49 1c-.52-.4-1.08-.73-1.69-.98l-.38-2.65C14.46 2.18 14.25 2 14 2h-4c-.25 0-.46.18-.49.42l-.38 2.65c-.61.25-1.17.59-1.69.98l-2.49-1c-.23-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64l2.11 1.65c-.04.32-.07.65-.07.98s.03.66.07.98l-2.11 1.65c-.19.15-.24.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1c.52.4 1.08.73 1.69.98l.38 2.65c.03.24.24.42.49.42h4c.25 0 .46-.18.49-.42l.38-2.65c.61-.25 1.17-.59 1.69.98l2.49 1c.23.09.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.65zM12 15.5c-1.93 0-3.5-1.57-3.5-3.5s1.57-3.5 3.5-3.5 3.5 1.57 3.5 3.5-1.57 3.5-3.5 3.5z"/></symbol>
+        <symbol id="icon-user" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></symbol>
+        <symbol id="icon-logout" viewBox="0 0 24 24"><path d="M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.58L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z"/></symbol>
+        <symbol id="icon-check-circle" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></symbol>
+        <symbol id="icon-lightbulb" viewBox="0 0 24 24"><path d="M9 21c0 .55.45 1 1 1h4c.55 0 1-.45 1-1v-1H9v1zm3-19C8.14 2 5 5.14 5 9c0 2.38 1.19 4.47 3 5.74V17c0 .55.45 1 1 1h6c.55 0 1-.45 1-1v-2.26c1.81-1.27 3-3.36 3-5.74 0-3.86-3.14-7-7-7z"/></symbol>
+        <symbol id="icon-shield-check" viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-1.06 14.44L6.5 11l1.41-1.41L10.94 13l4.24-4.24L16.6 10.17l-5.66 5.27z"/></symbol>
+        <symbol id="icon-zap" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z"/></symbol>
+    </svg>
+
+    <script src="scipt.js"></script>
+</body>
+</html>
